@@ -35,32 +35,52 @@ public class SearchEngine {
 
     public void search(String keyword) {
 
-        keyword = keyword.toLowerCase().trim();
+    String[] searchWords = keyword.toLowerCase().trim().split("\\W+");
 
-        HashSet<Integer> matchingDocuments = keywordIndex.get(keyword);
+    HashSet<Integer> matchingDocuments = null;
 
-        if (matchingDocuments == null || matchingDocuments.isEmpty()) {
+    for (String word : searchWords) {
 
+        if (word.isEmpty()) {
+            continue;
+        }
+
+        HashSet<Integer> documentsForWord = keywordIndex.get(word);
+
+        if (documentsForWord == null) {
             System.out.println("\nNo documents found.");
             return;
         }
 
-        System.out.println("\n========== SEARCH RESULTS ==========");
+        if (matchingDocuments == null) {
+            matchingDocuments = new HashSet<>(documentsForWord);
+        } else {
+            matchingDocuments.retainAll(documentsForWord);
+        }
+    }
 
-        for (Integer id : matchingDocuments) {
+    if (matchingDocuments == null || matchingDocuments.isEmpty()) {
 
-            for (Document document : documents) {
+        System.out.println("\nNo documents found.");
+        return;
+    }
 
-                if (document.getId() == id) {
+    System.out.println("\n========== SEARCH RESULTS ==========");
 
-                    System.out.println("\nDocument Found!");
-                    System.out.println("ID: " + document.getId());
-                    System.out.println("Title: " + document.getTitle());
-                    System.out.println("Content: " + document.getContent());
+    for (Integer id : matchingDocuments) {
 
-                    break;
-                }
+        for (Document document : documents) {
+
+            if (document.getId() == id) {
+
+                System.out.println("\nDocument Found!");
+                System.out.println("ID: " + document.getId());
+                System.out.println("Title: " + document.getTitle());
+                System.out.println("Content: " + document.getContent());
+
+                break;
             }
         }
     }
+}
 }
